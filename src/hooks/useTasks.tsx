@@ -2,31 +2,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
-
-export interface Task {
-  id: string;
-  title: string;
-  description: string | null;
-  division: string;
-  priority: 'alta' | 'media' | 'baixa';
-  status: 'pendente' | 'em_andamento' | 'concluida' | 'cancelada';
-  assigned_date: string;
-  deadline: string;
-  dependencies: string | null;
-  responsible_id: string | null;
-  created_by: string | null;
-  created_at: string;
-  updated_at: string;
-}
-
-export interface Militar {
-  id: string;
-  name: string;
-  rank: string;
-  division: string;
-  email: string | null;
-  active: boolean;
-}
+import { Task, Militar } from '@/types/Task';
 
 export const useTasks = () => {
   const [tasks, setTasks] = useState<Task[]>([]);
@@ -42,7 +18,15 @@ export const useTasks = () => {
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      setTasks(data || []);
+      
+      // Type cast the data to ensure proper typing
+      const typedTasks = (data || []).map(task => ({
+        ...task,
+        priority: task.priority as 'alta' | 'media' | 'baixa',
+        status: task.status as 'pendente' | 'em_andamento' | 'concluida' | 'cancelada'
+      }));
+      
+      setTasks(typedTasks);
     } catch (error) {
       console.error('Error fetching tasks:', error);
     }
@@ -88,8 +72,15 @@ export const useTasks = () => {
 
     if (error) throw error;
     
-    setTasks(prev => [data, ...prev]);
-    return data;
+    // Type cast the returned data
+    const typedTask = {
+      ...data,
+      priority: data.priority as 'alta' | 'media' | 'baixa',
+      status: data.status as 'pendente' | 'em_andamento' | 'concluida' | 'cancelada'
+    };
+    
+    setTasks(prev => [typedTask, ...prev]);
+    return typedTask;
   };
 
   const updateTask = async (id: string, updates: Partial<Task>) => {
@@ -102,8 +93,15 @@ export const useTasks = () => {
 
     if (error) throw error;
     
-    setTasks(prev => prev.map(task => task.id === id ? data : task));
-    return data;
+    // Type cast the returned data
+    const typedTask = {
+      ...data,
+      priority: data.priority as 'alta' | 'media' | 'baixa',
+      status: data.status as 'pendente' | 'em_andamento' | 'concluida' | 'cancelada'
+    };
+    
+    setTasks(prev => prev.map(task => task.id === id ? typedTask : task));
+    return typedTask;
   };
 
   const deleteTask = async (id: string) => {
