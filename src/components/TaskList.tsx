@@ -123,7 +123,7 @@ export const TaskList: React.FC<TaskListProps> = ({ tasks, onNewTask }) => {
                   <span>{task.division}</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className={isOverdue ? '⚠️' : '📅'}</span>
+                  <span className={isOverdue ? '⚠️' : '📅'}></span>
                   <span className={isOverdue ? 'text-red-600 font-medium' : ''}>
                     {isOverdue ? `${Math.abs(diffDays)} dias atrasado` : `${diffDays} dias restantes`}
                   </span>
